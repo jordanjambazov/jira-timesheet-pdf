@@ -9,6 +9,6 @@ default Jira API.
 
 - Clone this repository
 - `docker build -t jira-timesheet-export .`
-- ``docker run -it -v `pwd:`/code jira-timesheet-export python3 src/main.py``
+- ``docker run -it -v `pwd`:/code jira-timesheet-export python3 src/main.py``
 - Provide input once required
 - The script will output file named `report.pdf`
