@@ -1,4 +1,5 @@
 import getpass
+import textwrap
 from collections import defaultdict
 from datetime import datetime, timedelta
 from reportlab.pdfbase import pdfmetrics
@@ -76,7 +77,7 @@ def get_worklog():
         if row == 0 and date:
             return date.strftime("%d\n{0}".format(date.strftime("%a")[0]))
         if col == 0 and issue:
-            return "{0} - {1}".format(issue, issues_data[issue].fields.summary)
+            return textwrap.fill("{0} - {1}".format(issue, issues_data[issue].fields.summary),50)
         if date and issue:
             task_total = sum(map(lambda w: w['spent'],
                                  filter(lambda w: w['issue'].key == issue,
@@ -119,6 +120,7 @@ def get_worklog():
     elements.append(p)
 
     doc.build(elements)
+    print 'Done'
 
 
 def get_dates_in_range(from_date, to_date):
