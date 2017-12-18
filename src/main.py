@@ -120,7 +120,7 @@ def get_worklog():
     elements.append(p)
 
     doc.build(elements)
-    print 'Done'
+    print('Done')
 
 
 def get_dates_in_range(from_date, to_date):
