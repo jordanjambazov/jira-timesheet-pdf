@@ -1,2 +1,3 @@
 reportlab==3.3.0
-jira==1.0.9
+jira==1.0.14
+flask

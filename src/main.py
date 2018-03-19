@@ -1,4 +1,8 @@
 import getpass
+import argparse
+import os
+import socket
+from flask import Flask, make_response, send_file
 from collections import defaultdict
 from datetime import datetime, timedelta
 from reportlab.pdfbase import pdfmetrics
@@ -9,26 +13,31 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
 from reportlab.lib.styles import getSampleStyleSheet
 from jira import JIRA
 
+server = input("Enter server (e.g. jira.example.com): ")
+username = input("Username (e.g. joe.doe): ")
+password = getpass.getpass("Password: ")
+
+from_date = datetime.strptime(input("From date (e.g. 2016-12-01): "), '%Y-%m-%d').date()
+to_date = datetime.strptime(input("To date (e.g. 2016-12-31): "),'%Y-%m-%d').date()
+
+project = input("JIRA Project ID: ")
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--log', nargs='?', help='log')
+args = parser.parse_args()
+
 
 DATE_FORMAT = "%d/%m/%y"
 
+app = Flask(__name__)
 
-def get_worklog():
-    server = input("Enter server (e.g. jira.example.com): ")
-    username = input("Username (e.g. joe.doe): ")
-    password = getpass.getpass("Password: ")
-
-    from_date = datetime.strptime(input("From date (e.g. 2016-12-01): "),
-                                  '%Y-%m-%d').date()
-    to_date = datetime.strptime(input("To date (e.g. 2016-12-31): "),
-                                '%Y-%m-%d').date()
-    assignee = input("Enter username (e.g. john_smith): ")
+def get_worklog(assignee):
 
     jira = JIRA('https://{0}'.format(server),
                 basic_auth=(username, password))
-    jql = 'timespent > 0 ORDER BY updated DESC'
+    jql = 'timespent > 0 AND project = %s ORDER BY updated DESC' % project 
     issues = jira.search_issues(jql)
-
+        
     worklogs = []
     date_worklogs = defaultdict(list)
     issue_worklogs = defaultdict(list)
@@ -95,7 +104,7 @@ def get_worklog():
     ]
 
     register_fonts()
-    doc = SimpleDocTemplate("report.pdf", pagesize=landscape(letter))
+    doc = SimpleDocTemplate('%s.pdf' % assignee, pagesize=landscape(letter))
 
     elements = []
 
@@ -119,7 +128,9 @@ def get_worklog():
     elements.append(p)
 
     doc.build(elements)
-
+    
+    return doc
+    
 
 def get_dates_in_range(from_date, to_date):
     dates = []
@@ -142,9 +153,10 @@ def register_fonts():
                'UTF-8'))
 
 
-def main():
-    get_worklog()
-
+@app.route("/worklog/<assignee>")
+def worklog(assignee):
+    get_worklog(assignee)
+    return send_file('../%s.pdf' % assignee)
 
 if __name__ == "__main__":
-    main()
+    app.run(host='0.0.0.0', port=80)
