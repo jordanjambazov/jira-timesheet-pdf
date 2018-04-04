@@ -9,6 +9,7 @@ default Jira API.
 
 - Clone this repository
 - `docker build -t jira-timesheet-export .`
-- `docker run -it -p 81:80 -v `pwd`:/code jira-timesheet-export python3 src/main.py `
+- (Optional) Set ENV data using `env` file (copy env.default to env and adapt variables)
+- ```docker run --env-file=env -it -p 8080:80 -v `pwd`:/code jira-timesheet-export python3 src/main.py ```
 - Provide input once required
-- Browse to http://localhost:81/worklog/<assignee> where <assignee> is the name of the Jira worklog author you are interested in reporting on
+- Browse to http://localhost:8080/worklog/<assignee> where <assignee> is the name of the Jira worklog author you are interested in reporting on
