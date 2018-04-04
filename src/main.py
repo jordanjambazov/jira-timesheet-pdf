@@ -13,14 +13,37 @@ from reportlab.platypus import Paragraph, SimpleDocTemplate, Table
 from reportlab.lib.styles import getSampleStyleSheet
 from jira import JIRA
 
-server = input("Enter server (e.g. jira.example.com): ")
-username = input("Username (e.g. joe.doe): ")
-password = getpass.getpass("Password: ")
+if 'JIRA_SERVER' in os.environ:
+    server = os.environ['JIRA_SERVER']
+else:
+    server = input("Enter server (e.g. jira.example.com): ")
 
-from_date = datetime.strptime(input("From date (e.g. 2016-12-01): "), '%Y-%m-%d').date()
-to_date = datetime.strptime(input("To date (e.g. 2016-12-31): "),'%Y-%m-%d').date()
+if 'JIRA_USER' in os.environ:
+    username = os.environ['JIRA_USER']
+else:
+    username = input("Username (e.g. joe.doe): ")
 
-project = input("JIRA Project ID: ")
+if 'JIRA_USERPASSWORD' in os.environ:
+    password = os.environ['JIRA_USERPASSWORD']
+else:
+    password = getpass.getpass("Password: ")
+
+
+if 'JIRA_WORKLOG_FROM_DATE' in os.environ:
+    from_date = datetime.strptime(os.environ['JIRA_WORKLOG_FROM_DATE'], '%Y-%m-%d').date()
+else:
+    from_date = datetime.strptime(input("From date (e.g. 2016-12-01): "), '%Y-%m-%d').date()
+
+if 'JIRA_WORKLOG_TO_DATE' in os.environ:
+    to_date = datetime.strptime(os.environ['JIRA_WORKLOG_TO_DATE'], '%Y-%m-%d').date()
+else:
+    to_date = datetime.strptime(input("To date (e.g. 2016-12-31): "),'%Y-%m-%d').date()
+
+
+if 'JIRA_PROJECTID' in os.environ:
+    project = os.environ['JIRA_PROJECTID']
+else:
+    project = input("JIRA Project ID: ")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--log', nargs='?', help='log')
